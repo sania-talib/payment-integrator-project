@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Integrator</title>
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+        }
+        form {
+            display: grid;
+            gap: 10px;
+        }
+        input, button{
+            padding: 10px;
+        }
+        #response-message {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+    <h1> Process Payment</h1>
+    <form id="payment-form">
+        <label for="amount">Amount:</label>
+        <input type="number" id="amount" name="amount" value="100.00" step="0.01" required>
+
+        <label for="currency">Currency:</label>
+        <input type="text" id="currency" name="currency" value="USD" required>
+
+        <label for="last4">Card Last 4 Digits:</label>
+        <input type="text" id="last4" name="card_number_last_4" value="1234" required>
+
+        <button type="submit">Process Payment</button>
+
+
+
+
+    </form>
+    
+    <div id="response-message">
+
+        <script>
+            document.getElementById('payment-form').addEventListener('submit', function(event) {
+                event.preventDefault();
+
+                const formData = new FormData(event.target);
+                const data = Object.fromEntries(formData.entries());
+
+                fetch('/api/process-payment',{
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(Response => Response.json())
+                .then(result => {
+                    const responseDiv = document.getElementById('response-message');
+                    responseDiv.textContent = JSON.stringify(result, null, 2);
+                    if (result.error){
+                        responseDiv.style.borderColor = 'red';
+
+                    }else{
+                        responseDiv.style.borderColor = 'green';
+                    }
+                }).catch(error => {
+                    const responseDiv = document.getElementById('response-message');
+                    responseDiv.textContent = 'Error: Failed to connect to server.';
+                    responseDiv.style.borderColor = 'red';
+                });
+            });
+        </script>
+    </div>
+</body>
+</html>
